@@ -1,19 +1,33 @@
 apply plugin: 'com.android.application'
 
-apply plugin: 'kotlin-android'
-
-apply plugin: 'kotlin-android-extensions'
-
 android {
-    compileSdkVersion 26
+    compileSdkVersion rootProject.ext.android.compileSdkVersion
+
     defaultConfig {
-        applicationId "com.pfl.component"
-        minSdkVersion 15
-        targetSdkVersion 26
-        versionCode 1
-        versionName "1.0"
+        applicationId rootProject.ext.android.applicationId
+        minSdkVersion rootProject.ext.android.minSdkVersion
+        targetSdkVersion rootProject.ext.android.targetSdkVersion
+        versionCode rootProject.ext.android.versionCode
+        versionName rootProject.ext.android.versionName
+
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        // ARouter 配置 1
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [moduleName: project.getName()]
+            }
+        }
+
+        // ARouter 配置 2
+        javaCompileOptions {
+            annotationProcessorOptions {
+                includeCompileClasspath = true
+            }
+        }
+
     }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -23,11 +37,19 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation"org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
-    implementation 'com.android.support:appcompat-v7:26.0.0-beta1'
-    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:0.5'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:2.2.2'
+
+    if (!isModule.toBoolean()) {
+        implementation project(':module1')
+        implementation project(':module2')
+        //implementation project(':module_user')
+    } else {
+        implementation project(':common')
+    }
+
+
+    // ARouter 配置 3
+    annotationProcessor rootProject.ext.deps.arouter_compiler
+    annotationProcessor rootProject.ext.deps.dagger_compiler
+    annotationProcessor rootProject.ext.deps.inflaterauto_compiler
+
 }
